@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập Toán 10 - Trắc Nghiệm Tương Tác</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX CDN cho Công thức Toán -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Custom styles for latex inline elements */
+        .katex-display { margin: 0.5em 0; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="bg-indigo-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                    <i class="fa-solid fa-square-root-variable text-2xl text-yellow-300"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg sm:text-xl leading-tight">Luyện Tập Toán 10</h1>
+                    <p class="text-xs text-indigo-200 hidden sm:block">Đề Kiểm Tra Giữa Học Kỳ I - Bộ Câu Hỏi Chuẩn</p>
+                </div>
+            </div>
+
+            <!-- Header Controls / Timer -->
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <div id="timer-display" class="hidden items-center bg-red-500/90 text-white px-3 py-1.5 rounded-full font-mono font-bold text-sm sm:text-base animate-pulse shadow">
+                    <i class="fa-regular fa-clock mr-2"></i><span id="time-left">45:00</span>
+                </div>
+                <button id="btn-mode-toggle" onclick="toggleMode()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center shadow-sm">
+                    <i class="fa-solid fa-graduation-cap mr-2"></i>
+                    <span id="mode-text">Chế độ: Luyện tập</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6">
+
+        <!-- SIDEBAR / FILTERS & STATS -->
+        <aside class="w-full lg:w-80 flex-shrink-0 space-y-5">
+            
+            <!-- Filter Box -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                <h2 class="font-bold text-slate-900 text-lg flex items-center text-indigo-600">
+                    <i class="fa-solid fa-filter mr-2"></i> Bộ Lọc Câu Hỏi
+                </h2>
+                
+                <!-- Filter by Topic -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Chủ đề / Dạng bài</label>
+                    <select id="filter-topic" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-300 text-slate-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                        <option value="all">Tất cả chủ đề</option>
+                        <option value="dạng 1">Dạng 1: Tập hợp</option>
+                        <option value="dạng 2">Dạng 2: BPT & Hệ BPT 2 ẩn</option>
+                        <option value="dạng 3">Dạng 3: Lượng giác & Tam giác</option>
+                        <option value="đúng sai">Phần II: Trắc nghiệm Đúng/Sai</option>
+                    </select>
+                </div>
+
+                <!-- Filter by Difficulty -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Mức độ nhận thức</label>
+                    <select id="filter-level" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-300 text-slate-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                        <option value="all">Tất cả mức độ</option>
+                        <option value="Nhận biết">Nhận biết</option>
+                        <option value="Thông hiểu">Thông hiểu</option>
+                        <option value="Vận dụng">Vận dụng</option>
+                        <option value="Vận dụng cao">Vận dụng cao</option>
+                    </select>
+                </div>
+
+                <!-- Stats summary in sidebar -->
+                <div class="pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500 font-medium">
+                    <span>Tổng số câu hiển thị:</span>
+                    <span id="filtered-count" class="font-bold text-indigo-600">0</span>
+                </div>
+            </div>
+
+            <!-- Quiz Navigation Grid -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-sm mb-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-grip mr-2 text-indigo-600"></i>Danh Sách Câu Hỏi</span>
+                    <span id="completion-status" class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">0/0</span>
+                </h3>
+                <div id="question-grid" class="grid grid-cols-5 gap-2 max-h-60 overflow-y-auto custom-scrollbar p-1">
+                    <!-- Dynamic Question Buttons generated by JS -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+                <button id="btn-submit" onclick="submitExam()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> Nộp Bài & Chấm Điểm
+                </button>
+                <button id="btn-reset" onclick="resetQuiz()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 px-4 rounded-xl transition flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> Làm lại từ đầu
+                </button>
+            </div>
+        </aside>
+
+        <!-- QUESTION CONTAINER -->
+        <section class="flex-1 space-y-6">
+
+            <!-- Result Scorecard Banner (Hidden by default) -->
+            <div id="result-card" class="hidden bg-gradient-to-r from-indigo-600 to-violet-600 text-white p-6 rounded-2xl shadow-xl relative overflow-hidden">
+                <div class="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <span class="inline-block bg-white/20 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Kết quả bài làm</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold" id="result-title">Hoàn Thành Bài Thi!</h2>
+                        <p class="text-indigo-100 text-sm mt-1" id="result-sub">Bạn đã hoàn thành bài thi trắc nghiệm.</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center border border-white/20 min-w-[140px]">
+                        <div class="text-3xl font-black text-yellow-300" id="final-score">0.0</div>
+                        <div class="text-xs text-indigo-100 font-medium mt-1" id="score-details">Đúng 0 / 0 câu</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Cards Feed -->
+            <div id="questions-list" class="space-y-6">
+                <!-- Dynamic Questions will be inserted here -->
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-slate-500 text-xs mt-auto">
+        <p>© Ứng dụng Ôn tập Trắc nghiệm Toán 10 | Thiết kế hiện đại & Tương tác cao</p>
+    </footer>
+
+    <!-- SCRIPT LOGIC & DATA -->
+    <script>
+        // DATA STRUCTURE
+        const questionsData = [
+            // DẠNG 1: TẬP HỢP
+            {
+                id: 1,
+                topic: "dạng 1",
+                level: "Nhận biết",
+                type: "mcq",
+                content: "Cho hai tập hợp $A = [-2; 3)$ và $B = [1; 5]$. Hãy tìm tập hợp $A \\cap B$.",
+                options: [
+                    "$[-2; 5]$",
+                    "$[1; 3)$",
+                    "$[-2; 1]$",
+                    "$(3; 5]$"
+                ],
+                correct: 1, // B
+                explanation: "Giao của hai tập hợp $A \\cap B = [-2; 3) \\cap [1; 5] = [1; 3)$."
+            },
+            {
+                id: 2,
+                topic: "dạng 1",
+                level: "Thông hiểu",
+                type: "mcq",
+                content: "Cho các tập hợp $A = (- \\infty; 2]$, $B = (-1; 4]$. Khi đó tập hợp $A \\setminus B$ bằng:",
+                options: [
+                    "$(-\\infty; -1]$",
+                    "$(2; 4]$",
+                    "$(-1; 2]$",
+                    "$(-\\infty; -1)$"
+                ],
+                correct: 0, // A
+                explanation: "Hiệu của hai tập hợp $A \\setminus B = (-\\infty; 2] \\setminus (-1; 4] = (-\\infty; -1]$."
+            },
+
+            // DẠNG 2: BPT VÀ HỆ BPT BẬC NHẤT 2 ẨN
+            {
+                id: 3,
+                topic: "dạng 2",
+                level: "Nhận biết",
+                type: "mcq",
+                content: "Cặp số $(x; y) = (1; -1)$ là nghiệm của bất phương trình nào dưới đây?",
+                options: [
+                    "$x + y - 3 > 0$",
+                    "$-x - y < 0$",
+                    "$x + 3y + 1 < 0$",
+                    "$-x - 3y - 1 < 0$"
+                ],
+                correct: 2, // C
+                explanation: "Thay $x = 1, y = -1$ vào câu C: $1 + 3(-1) + 1 = -1 < 0$ (Đúng)."
+            },
+            {
+                id: 4,
+                topic: "dạng 2",
+                level: "Thông hiểu",
+                type: "mcq",
+                content: "Nửa mặt phẳng kể cả bờ trong hình vẽ dưới đây là miền nghiệm của bất phương trình nào?",
+                svgType: "line_2x_y_2", // Special SVG graph render signal
+                options: [
+                    "$2x + y \\le 2$",
+                    "$x + 2y \\le 2$",
+                    "$2x + y \\ge 2$",
+                    "$x + 2y \\ge 2$"
+                ],
+                correct: 0, // A
+                explanation: "Đường thẳng qua $(1; 0)$ và $(0; 2)$ có phương trình $2x + y = 2$. Gốc tọa độ $(0;0)$ nằm trong miền nghiệm bị gạch, thay $(0;0)$ vào $2x + y \\le 2$ được $0 \\le 2$ (Đúng). Do đó BPT là $2x + y \\le 2$."
+            },
+            {
+                id: 5,
+                topic: "dạng 2",
+                level: "Nhận biết",
+                type: "mcq",
+                content: "Cặp số nào dưới đây **không** là nghiệm của hệ bất phương trình $\\begin{cases} x + y - 2 \\le 0 \\\\ 2x - y + 2 \\ge 0 \\end{cases}$?",
+                options: [
+                    "$(0; 0)$",
+                    "$(1; 1)$",
+                    "$(-1; 1)$",
+                    "$(2; 2)$"
+                ],
+                correct: 3, // D
+                explanation: "Thay $(2; 2)$ vào BPT đầu: $2 + 2 - 2 = 2 \\le 0$ (Sai). Vậy $(2;2)$ không phải nghiệm."
+            },
+            {
+                id: 6,
+                topic: "dạng 2",
+                level: "Nhận biết",
+                type: "mcq",
+                content: "Cặp số nào sau đây là nghiệm của bất phương trình $2x - 3y + 1 > 0$?",
+                options: [
+                    "$(0; 1)$",
+                    "$(1; 0)$",
+                    "$(-1; 1)$",
+                    "$(1; 2)$"
+                ],
+                correct: 1, // B
+                explanation: "Thay $(1; 0)$ vào BPT: $2(1) - 3(0) + 1 = 3 > 0$ (Đúng)."
+            },
+            {
+                id: 7,
+                topic: "dạng 2",
+                level: "Nhận biết",
+                type: "mcq",
+                content: "Điểm $M(1; -1)$ thuộc miền nghiệm của bất phương trình nào sau đây?",
+                options: [
+                    "$x + 2y - 1 > 0$",
+                    "$x - y - 1 < 0$",
+                    "$2x + y + 1 > 0$",
+                    "$x + y - 1 > 0$"
+                ],
+                correct: 2, // C
+                explanation: "Thay $(1; -1)$ vào C: $2(1) + (-1) + 1 = 2 > 0$ (Đúng)."
+            },
+            {
+                id: 8,
+                topic: "dạng 2",
+                level: "Thông hiểu",
+                type: "mcq",
+                content: "Cho hệ bất phương trình: $\\begin{cases} x + y > 0 \\\\ 2x - 5y + 3 < 0 \\end{cases}$. Miền nghiệm của hệ chứa điểm nào sau đây?",
+                options: [
+                    "$(1; 2)$",
+                    "$(-1; -1)$",
+                    "$(2; 1)$",
+                    "$(0; 0)$"
+                ],
+                correct: 0, // A
+                explanation: "Thay $(1; 2)$ vào hệ: $1+2=3>0$ (Đúng) và $2(1)-5(2)+3 = -5 < 0$ (Đúng)."
+            },
+            {
+                id: 9,
+                topic: "dạng 2",
+                level: "Vận dụng",
+                type: "mcq",
+                content: "Miền không gạch chéo (kể cả bờ) dưới đây là miền nghiệm của hệ bất phương trình nào?",
+                svgType: "system_region", // Special SVG graph
+                options: [
+                    "$\\begin{cases} x \\ge 0 \\\\ y \\ge 0 \\\\ x + y \\le 3 \\end{cases}$",
+                    "$\\begin{cases} x > 0 \\\\ y > 0 \\\\ x + y < 3 \\end{cases}$",
+                    "$\\begin{cases} x \\le 0 \\\\ y \\le 0 \\\\ x + y \\ge 3 \\end{cases}$",
+                    "$\\begin{cases} x \\ge 0 \\\\ y \\ge 0 \\\\ x + y \\ge 3 \\end{cases}$"
+                ],
+                correct: 0, // A
+                explanation: "Miền nghiệm nằm ở góc phần tư thứ nhất ($x \\ge 0, y \\ge 0$) và nằm phía dưới đường thẳng $x + y = 3$, kể cả bờ."
+            },
+
+            // DẠNG 3: GIÁ TRỊ LƯỢNG GIÁC, ĐỊNH LÝ SIN/COSIN, TÍNH DIỆN TÍCH
+            {
+                id: 10,
+                topic: "dạng 3",
+                level: "Nhận biết",
+                type: "mcq",
+                content: "Giá trị của $\\sin 30^\\circ$ bằng bao nhiêu?",
+                options: [
+                    "$\\frac{1}{2}$",
+                    "$\\frac{\\sqrt{3}}{2}$",
+                    "$\\frac{\\sqrt{2}}{2}$",
+                    "$1$"
+                ],
+                correct: 0, // A
+                explanation: "Theo bảng giá trị lượng giác cơ bản, $\\sin 30^\\circ = \\frac{1}{2}$."
+            },
+            {
+                id: 11,
+                topic: "dạng 3",
+                level: "Nhận biết",
+                type: "mcq",
+                content: "Trong các đẳng thức sau, đẳng thức nào **đúng**?",
+                options: [
+                    "$\\sin(180^\\circ - \\alpha) = -\\sin\\alpha$",
+                    "$\\cos(180^\\circ - \\alpha) = \\cos\\alpha$",
+                    "$\\tan(180^\\circ - \\alpha) = -\\tan\\alpha$",
+                    "$\\cot(180^\\circ - \\alpha) = \\cot\\alpha$"
+                ],
+                correct: 2, // C
+                explanation: "Hai góc bù nhau thì $\\sin$ bằng nhau, còn $\\cos, \\tan, \\cot$ đối nhau. Do đó $\\tan(180^\\circ - \\alpha) = -\\tan\\alpha$ là đúng."
+            },
+            {
+                id: 12,
+                topic: "dạng 3",
+                level: "Nhận biết",
+                type: "mcq",
+                content: "Gọi $R$ là bán kính đường tròn ngoại tiếp tam giác $ABC$. Đẳng thức nào dưới đây **sai**?",
+                options: [
+                    "$\\frac{a}{\\sin A} = 2R$",
+                    "$\\sin B = \\frac{b}{2R}$",
+                    "$a = 2R \\sin A$",
+                    "$\\frac{c}{\\sin C} = R$"
+                ],
+                correct: 3, // D
+                explanation: "Theo định lý Sin: $\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C} = 2R$. Vậy đẳng thức $\\frac{c}{\\sin C} = R$ là sai."
+            },
+            {
+                id: 13,
+                topic: "dạng 3",
+                level: "Thông hiểu",
+                type: "mcq",
+                content: "Cho tam giác $ABC$ có $b = 4, c = 5, \\widehat{A} = 150^\\circ$. Tính diện tích tam giác $ABC$?",
+                options: [
+                    "$S = 5$",
+                    "$S = 5\\sqrt{3}$",
+                    "$S = 10$",
+                    "$S = 10\\sqrt{3}$"
+                ],
+                correct: 0, // A
+                explanation: "Công thức diện tích: $S = \\frac{1}{2} b c \\sin A = \\frac{1}{2} \\cdot 4 \\cdot 5 \\cdot \\sin 150^\\circ = 10 \\cdot \\frac{1}{2} = 5$."
+            },
+            {
+                id: 14,
+                topic: "dạng 3",
+                level: "Nhận biết",
+                type: "mcq",
+                content: "Trong tam giác $ABC$, đẳng thức nào sau đây đúng với định lý Cosin?",
+                options: [
+                    "$a^2 = b^2 + c^2 - 2bc \\cos A$",
+                    "$a^2 = b^2 + c^2 + 2bc \\cos A$",
+                    "$a^2 = b^2 + c^2 - bc \\cos A$",
+                    "$a^2 = b^2 + c^2 + bc \\cos A$"
+                ],
+                correct: 0, // A
+                explanation: "Định lý Cosin chuẩn: $a^2 = b^2 + c^2 - 2bc \\cos A$."
+            },
+            {
+                id: 15,
+                topic: "dạng 3",
+                level: "Vận dụng",
+                type: "mcq",
+                content: "Tính giá trị biểu thức $P = \\sin 30^\\circ \\cos 60^\\circ + \\sin 60^\\circ \\cos 30^\\circ$.",
+                options: [
+                    "$P = 1$",
+                    "$P = 0$",
+                    "$P = \\frac{1}{2}$",
+                    "$P = \\frac{\\sqrt{3}}{2}$"
+                ],
+                correct: 0, // A
+                explanation: "$P = \\frac{1}{2} \\cdot \\frac{1}{2} + \\frac{\\sqrt{3}}{2} \\cdot \\frac{\\sqrt{3}}{2} = \\frac{1}{4} + \\frac{3}{4} = 1$."
+            },
+            {
+                id: 16,
+                topic: "dạng 3",
+                level: "Nhận biết",
+                type: "mcq",
+                content: "Trong tam giác $ABC$ có $a=6, b=8, c=10$. Số đo góc $C$ bằng:",
+                options: [
+                    "$90^\\circ$",
+                    "$60^\\circ$",
+                    "$45^\\circ$",
+                    "$30^\\circ$"
+                ],
+                correct: 0, // A
+                explanation: "Tam giác có $6^2 + 8^2 = 36 + 64 = 100 = 10^2$ ($a^2 + b^2 = c^2$) nên là tam giác vuông tại $C$. Vậy $\\widehat{C} = 90^\\circ$."
+            },
+            {
+                id: 17,
+                topic: "dạng 3",
+                level: "Thông hiểu",
+                type: "mcq",
+                content: "Cho $a, b, c$ là độ dài 3 cạnh của tam giác $ABC$. Biết $b = 7, c = 5, \\widehat{A} = 60^\\circ$. Tính độ dài cạnh $a$.",
+                options: [
+                    "$a = \\sqrt{39}$",
+                    "$a = 39$",
+                    "$a = 9$",
+                    "$a = \\sqrt{109}$"
+                ],
+                correct: 0, // A
+                explanation: "$a^2 = b^2 + c^2 - 2bc \\cos A = 7^2 + 5^2 - 2(7)(5) \\cos 60^\\circ = 49 + 25 - 70 \\cdot \\frac{1}{2} = 74 - 35 = 39 \\Rightarrow a = \\sqrt{39}$."
+            },
+            {
+                id: 18,
+                topic: "dạng 3",
+                level: "Vận dụng",
+                type: "mcq",
+                content: "Cho tam giác $ABC$ có góc $\\widehat{B} = 60^\\circ$, $\\widehat{C} = 45^\\circ$, cạnh $b = 4$. Tính độ dài cạnh $c$.",
+                options: [
+                    "$c = \\frac{4\\sqrt{6}}{3}$",
+                    "$c = 2\\sqrt{6}$",
+                    "$c = \\frac{2\\sqrt{6}}{3}$",
+                    "$c = 4\\sqrt{2}$"
+                ],
+                correct: 0, // A
+                explanation: "Theo định lý Sin: $\\frac{b}{\\sin B} = \\frac{c}{\\sin C} \\Rightarrow c = \\frac{b \\sin C}{\\sin B} = \\frac{4 \\cdot \\sin 45^\\circ}{\\sin 60^\\circ} = \\frac{4 \\cdot \\frac{\\sqrt{2}}{2}}{\\frac{\\sqrt{3}}{2}} = \\frac{4\\sqrt{2}}{\\sqrt{3}} = \\frac{4\\sqrt{6}}{3}$."
+            },
+
+            // PHẦN II: CÂU TRẮC NGHIỆM ĐÚNG SAI
+            {
+                id: 19,
+                topic: "đúng sai",
+                level: "Vận dụng",
+                type: "tf",
+                content: "Cho hai tập hợp $A = [-2; 4)$ và $B = (0; 5]$. Xét tính đúng/sai của các khẳng định sau:",
+                items: [
+                    { label: "a", text: "$A \\cap B = (0; 4)$", correct: true },
+                    { label: "b", text: "$A \\cup B = [-2; 5]$", correct: true },
+                    { label: "c", text: "$A \\setminus B = [-2; 0)$", correct: false, explanation: "Đúng phải là $A \\setminus B = [-2; 0]$." },
+                    { label: "d", text: "$B \\setminus A = [4; 5]$", correct: true }
+                ],
+                explanation: "Chi tiết: $A \\cap B = (0; 4)$; $A \\cup B = [-2; 5]$; $A \\setminus B = [-2; 0]$; $B \\setminus A = [4; 5]$."
+            },
+            {
+                id: 20,
+                topic: "đúng sai",
+                level: "Vận dụng cao",
+                type: "tf",
+                content: "Cho tam giác $ABC$ có $a = 7, b = 8, c = 9$. Xét tính đúng/sai của các mệnh đề sau:",
+                items: [
+                    { label: "a", text: "Độ dài nửa chu vi $p = 12$", correct: true },
+                    { label: "b", text: "Góc $\\widehat{A}$ thỏa mãn $\\cos A = \\frac{2}{3}$", correct: true, explanation: "$\\cos A = \\frac{8^2+9^2-7^2}{2 \\cdot 8 \\cdot 9} = \\frac{96}{144} = \\frac{2}{3}$." },
+                    { label: "c", text: "Diện tích tam giác $ABC$ bằng $12\\sqrt{5}$", correct: true, explanation: "$S = \\sqrt{12(12-7)(12-8)(12-9)} = \\sqrt{12 \\cdot 5 \\cdot 4 \\cdot 3} = 12\\sqrt{5}$." },
+                    { label: "d", text: "Chiều cao $h_a$ hạ từ đỉnh $A$ bằng $3\\sqrt{5}$", correct: false, explanation: "$h_a = \\frac{2S}{a} = \\frac{24\\sqrt{5}}{7} \\neq 3\\sqrt{5}$." }
+                ],
+                explanation: "Áp dụng các công thức Herong, Định lý Cosin và $S = \\frac{1}{2}a h_a$."
+            },
+            {
+                id: 21,
+                topic: "đúng sai",
+                level: "Vận dụng cao",
+                type: "tf",
+                content: "Cho góc $\\alpha$ thỏa mãn $\\sin \\alpha = \\frac{3}{5}$ và $90^\\circ < \\alpha < 180^\\circ$. Xét tính đúng/sai:",
+                items: [
+                    { label: "a", text: "$\\cos \\alpha = -\\frac{4}{5}$", correct: true, explanation: "Vì $90^\\circ < \\alpha < 180^\\circ$ nên $\\cos \\alpha < 0 \\Rightarrow \\cos \\alpha = -\\sqrt{1 - \\sin^2 \\alpha} = -\\frac{4}{5}$." },
+                    { label: "b", text: "$\\tan \\alpha = \\frac{3}{4}$", correct: false, explanation: "$\\tan \\alpha = \\frac{\\sin \\alpha}{\\cos \\alpha} = -\\frac{3}{4}$." },
+                    { label: "c", text: "Biểu thức $P = 5\\sin \\alpha + 10\\cos \\alpha$ có giá trị bằng $-5$", correct: true, explanation: "$P = 5(\\frac{3}{5}) + 10(-\\frac{4}{5}) = 3 - 8 = -5$." },
+                    { label: "d", text: "Biểu thức $Q = \\tan^2 \\alpha \\cdot \\cos \\alpha$ có giá trị bằng $-\\frac{9}{20}$", correct: true, explanation: "$Q = (-\\frac{3}{4})^2 \\cdot (-\\frac{4}{5}) = \\frac{9}{16} \\cdot (-\\frac{4}{5}) = -\\frac{9}{20}$." }
+                ],
+                explanation: "Tính $\\cos \\alpha$ chú ý dấu của góc ở góc phần tư thứ II."
+            }
+        ];
+
+        // STATE VARIABLES
+        let currentQuizMode = 'practice'; // 'practice' or 'exam'
+        let userAnswers = {}; // { questionId: answerIndex OR { a: true/false, b: ... } }
+        let timerInterval = null;
+        let timeLeftSeconds = 45 * 60;
+        let isExamSubmitted = false;
+
+        // INITIALIZATION
+        window.onload = function() {
+            renderQuestions();
+            updateGrid();
+            renderMath();
+        };
+
+        function renderMath() {
+            setTimeout(() => {
+                if (window.renderMathInElement) {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false}
+                        ],
+                        throwOnError: false
+                    });
+                }
+            }, 50);
+        }
+
+        // RENDER QUESTIONS LIST
+        function renderQuestions() {
+            const container = document.getElementById('questions-list');
+            const topicFilter = document.getElementById('filter-topic').value;
+            const levelFilter = document.getElementById('filter-level').value;
+
+            const filtered = questionsData.filter(q => {
+                const matchTopic = (topicFilter === 'all') || (q.topic === topicFilter);
+                const matchLevel = (levelFilter === 'all') || (q.level === levelFilter);
+                return matchTopic && matchLevel;
+            });
+
+            document.getElementById('filtered-count').innerText = filtered.length;
+            container.innerHTML = '';
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-8 text-center text-slate-400 border border-slate-200">
+                        <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300"></i>
+                        <p class="font-medium">Không tìm thấy câu hỏi phù hợp với bộ lọc.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.id = `q-card-${q.id}`;
+                card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 transition hover:shadow-md";
+
+                // Header badge
+                let levelColor = "bg-blue-50 text-blue-700 border-blue-200";
+                if (q.level === "Thông hiểu") levelColor = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                if (q.level === "Vận dụng") levelColor = "bg-amber-50 text-amber-700 border-amber-200";
+                if (q.level === "Vận dụng cao") levelColor = "bg-rose-50 text-rose-700 border-rose-200";
+
+                let html = `
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <span class="font-bold text-indigo-600 text-sm bg-indigo-50 px-3 py-1 rounded-lg">Câu ${q.id}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full border ${levelColor}">${q.level}</span>
+                            <span class="text-xs font-medium text-slate-400 capitalize">${q.topic}</span>
+                        </div>
+                    </div>
+                    <div class="text-slate-800 font-medium text-base mb-4 leading-relaxed">${q.content}</div>
+                `;
+
+                // Render SVG Graphs if applicable
+                if (q.svgType === 'line_2x_y_2') {
+                    html += getSvgGraph2xY2();
+                } else if (q.svgType === 'system_region') {
+                    html += getSvgGraphSystem();
+                }
+
+                // Render Options based on Type
+                if (q.type === 'mcq') {
+                    html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">`;
+                    const labels = ['A', 'B', 'C', 'D'];
+                    q.options.forEach((opt, optIdx) => {
+                        const isSelected = userAnswers[q.id] === optIdx;
+                        let btnClass = "bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700";
+
+                        if (isSelected) {
+                            btnClass = "bg-indigo-50 border-indigo-500 text-indigo-700 font-semibold shadow-sm";
+                        }
+
+                        if ((currentQuizMode === 'practice' && isSelected) || isExamSubmitted) {
+                            if (optIdx === q.correct) {
+                                btnClass = "bg-emerald-50 border-emerald-500 text-emerald-700 font-semibold";
+                            } else if (isSelected) {
+                                btnClass = "bg-rose-50 border-rose-500 text-rose-700 font-semibold";
+                            }
+                        }
+
+                        html += `
+                            <button onclick="selectOption(${q.id}, ${optIdx})" 
+                                class="w-full text-left p-3.5 rounded-xl border-2 transition flex items-start space-x-3 ${btnClass}">
+                                <span class="w-6 h-6 rounded-full bg-white border border-slate-300 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0 mt-0.5">${labels[optIdx]}</span>
+                                <span class="flex-1">${opt}</span>
+                            </button>
+                        `;
+                    });
+                    html += `</div>`;
+                } else if (q.type === 'tf') {
+                    // True/False Table Layout
+                    html += `
+                        <div class="overflow-x-auto mb-3">
+                            <table class="w-full text-sm text-left text-slate-600 border border-slate-200 rounded-lg">
+                                <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                                    <tr>
+                                        <th class="px-4 py-3 w-12 text-center">Ý</th>
+                                        <th class="px-4 py-3">Mệnh đề</th>
+                                        <th class="px-4 py-3 w-32 text-center">Lựa chọn</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    q.items.forEach(item => {
+                        const currentVal = userAnswers[q.id] ? userAnswers[q.id][item.label] : undefined;
+                        
+                        let trueClass = "bg-slate-100 text-slate-600 hover:bg-emerald-100";
+                        let falseClass = "bg-slate-100 text-slate-600 hover:bg-rose-100";
+
+                        if (currentVal === true) trueClass = "bg-emerald-600 text-white font-bold shadow-sm";
+                        if (currentVal === false) falseClass = "bg-rose-600 text-white font-bold shadow-sm";
+
+                        html += `
+                            <tr class="border-b border-slate-100 hover:bg-slate-50/50">
+                                <td class="px-4 py-3 font-bold text-center text-indigo-600">${item.label})</td>
+                                <td class="px-4 py-3">${item.text}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                                        <button onclick="selectTF(${q.id}, '${item.label}', true)" class="px-3 py-1.5 text-xs rounded-l-lg border border-slate-200 transition ${trueClass}">Đúng</button>
+                                        <button onclick="selectTF(${q.id}, '${item.label}', false)" class="px-3 py-1.5 text-xs rounded-r-lg border border-slate-200 transition ${falseClass}">Sai</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    html += `</tbody></table></div>`;
+                }
+
+                // Explanation Box (Shown in Practice Mode on select or after submission)
+                const showExplanation = (currentQuizMode === 'practice' && userAnswers[q.id] !== undefined) || isExamSubmitted;
+                if (showExplanation && q.explanation) {
+                    html += `
+                        <div class="mt-4 p-4 rounded-xl bg-indigo-50/80 border border-indigo-100 text-slate-700 text-sm space-y-1">
+                            <div class="font-bold text-indigo-800 flex items-center">
+                                <i class="fa-solid fa-lightbulb text-yellow-500 mr-2"></i>Lời giải chi tiết:
+                            </div>
+                            <div class="leading-relaxed">${q.explanation}</div>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = html;
+                container.appendChild(card);
+            });
+
+            renderMath();
+            updateGrid();
+        }
+
+        // SVG GENERATORS FOR MATH GRAPHS
+        function getSvgGraph2xY2() {
+            return `
+            <div class="my-4 flex justify-center">
+                <svg width="300" height="240" viewBox="-40 -40 240 240" class="bg-white border border-slate-200 rounded-xl shadow-inner">
+                    <defs>
+                        <pattern id="hatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                            <line x1="0" y1="0" x2="0" y2="8" stroke="#94a3b8" stroke-width="1.5" />
+                        </pattern>
+                    </defs>
+                    <!-- Axes -->
+                    <line x1="-30" y1="140" x2="170" y2="140" stroke="#475569" stroke-width="1.5"/>
+                    <line x1="50" y1="210" x2="50" y2="-20" stroke="#475569" stroke-width="1.5"/>
+                    <polygon points="170,140 162,136 162,144" fill="#475569"/>
+                    <polygon points="50,-20 46,-12 54,-12" fill="#475569"/>
+                    <text x="165" y="158" font-size="12" font-style="italic">x</text>
+                    <text x="35" y="-10" font-size="12" font-style="italic">y</text>
+                    <text x="38" y="155" font-size="11">O</text>
+
+                    <!-- Points & Grid -->
+                    <text x="95" y="155" font-size="11">1</text>
+                    <text x="35" y="65" font-size="11">2</text>
+                    <circle cx="100" cy="140" r="2.5" fill="#1e293b"/>
+                    <circle cx="50" cy="60" r="2.5" fill="#1e293b"/>
+
+                    <!-- Shaded Region (2x + y > 2) -->
+                    <polygon points="-10,180 50,60 100,140 130,80 -10,-10" fill="url(#hatch)" opacity="0.6" />
+                    <line x1="-10" y1="180" x2="120" y2="-15" stroke="#2563eb" stroke-width="2.5"/>
+
+                    <text x="100" y="40" font-size="11" fill="#2563eb" font-weight="bold">2x + y = 2</text>
+                </svg>
+            </div>
+            `;
+        }
+
+        function getSvgGraphSystem() {
+            return `
+            <div class="my-4 flex justify-center">
+                <svg width="280" height="240" viewBox="-30 -30 220 220" class="bg-white border border-slate-200 rounded-xl shadow-inner">
+                    <defs>
+                        <pattern id="hatch2" width="6" height="6" patternTransform="rotate(-45 0 0)" patternUnits="userSpaceOnUse">
+                            <line x1="0" y1="0" x2="0" y2="6" stroke="#cbd5e1" stroke-width="1" />
+                        </pattern>
+                    </defs>
+                    <!-- Axes -->
+                    <line x1="-20" y1="150" x2="160" y2="150" stroke="#475569" stroke-width="1.5"/>
+                    <line x1="30" y1="180" x2="30" y2="-10" stroke="#475569" stroke-width="1.5"/>
+                    <text x="155" y="165" font-size="12">x</text>
+                    <text x="18" y="-2" font-size="12">y</text>
+                    <text x="18" y="165" font-size="11">O</text>
+
+                    <text x="130" y="165" font-size="11">3</text>
+                    <text x="18" y="50" font-size="11">3</text>
+
+                    <!-- Boundary Line x+y=3 -->
+                    <line x1="-10" y1="110" x2="150" y2="-5" stroke="#dc2626" stroke-width="2"/>
+
+                    <!-- Shaded OUTSIDE Triangle -->
+                    <rect x="-30" y="-30" width="60" height="250" fill="url(#hatch2)"/>
+                    <rect x="-30" y="150" width="250" height="60" fill="url(#hatch2)"/>
+                    <polygon points="-10,110 150,-5 160,-30 160,160 -30,160" fill="url(#hatch2)"/>
+
+                    <!-- Triangle Region (Non-shaded) -->
+                    <polygon points="30,150 130,150 30,50" fill="#3b82f6" fill-opacity="0.15" stroke="#2563eb" stroke-width="1.5"/>
+                    <text x="55" y="120" font-size="12" fill="#1d4ed8" font-weight="bold">Miền nghiệm</text>
+                </svg>
+            </div>
+            `;
+        }
+
+        // USER INTERACTION HANDLERS
+        function selectOption(qId, optionIdx) {
+            if (isExamSubmitted) return;
+            userAnswers[qId] = optionIdx;
+            renderQuestions();
+        }
+
+        function selectTF(qId, label, val) {
+            if (isExamSubmitted) return;
+            if (!userAnswers[qId] || typeof userAnswers[qId] !== 'object') {
+                userAnswers[qId] = {};
+            }
+            userAnswers[qId][label] = val;
+            renderQuestions();
+        }
+
+        function applyFilters() {
+            renderQuestions();
+        }
+
+        // GRID NAVIGATION UPDATER
+        function updateGrid() {
+            const grid = document.getElementById('question-grid');
+            grid.innerHTML = '';
+
+            let answeredCount = 0;
+
+            questionsData.forEach(q => {
+                const btn = document.createElement('button');
+                btn.onclick = () => {
+                    const el = document.getElementById(`q-card-${q.id}`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                };
+
+                let isAnswered = false;
+                if (q.type === 'mcq' && userAnswers[q.id] !== undefined) isAnswered = true;
+                if (q.type === 'tf' && userAnswers[q.id] && Object.keys(userAnswers[q.id]).length === 4) isAnswered = true;
+
+                if (isAnswered) answeredCount++;
+
+                let bgClass = "bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200";
+                if (isAnswered) bgClass = "bg-indigo-600 text-white font-bold border-indigo-600";
+
+                if (isExamSubmitted) {
+                    if (q.type === 'mcq') {
+                        if (userAnswers[q.id] === q.correct) bgClass = "bg-emerald-600 text-white font-bold";
+                        else bgClass = "bg-rose-600 text-white font-bold";
+                    } else {
+                        bgClass = "bg-amber-500 text-white font-bold";
+                    }
+                }
+
+                btn.className = `h-9 rounded-lg border text-xs font-semibold flex items-center justify-center transition ${bgClass}`;
+                btn.innerText = q.id;
+                grid.appendChild(btn);
+            });
+
+            document.getElementById('completion-status').innerText = `${answeredCount}/${questionsData.length}`;
+        }
+
+        // MODE TOGGLE & TIMER
+        function toggleMode() {
+            if (currentQuizMode === 'practice') {
+                currentQuizMode = 'exam';
+                document.getElementById('mode-text').innerText = 'Chế độ: Thi thử';
+                document.getElementById('timer-display').classList.remove('hidden');
+                document.getElementById('timer-display').classList.add('flex');
+                startTimer();
+            } else {
+                currentQuizMode = 'practice';
+                document.getElementById('mode-text').innerText = 'Chế độ: Luyện tập';
+                document.getElementById('timer-display').classList.add('hidden');
+                document.getElementById('timer-display').classList.remove('flex');
+                clearInterval(timerInterval);
+            }
+            renderQuestions();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeftSeconds = 45 * 60;
+            timerInterval = setInterval(() => {
+                timeLeftSeconds--;
+                const min = Math.floor(timeLeftSeconds / 60);
+                const sec = timeLeftSeconds % 60;
+                document.getElementById('time-left').innerText = `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`;
+
+                if (timeLeftSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    alert('Đã hết thời gian làm bài!');
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        // SUBMIT & SCORE LOGIC
+        function submitExam() {
+            if (isExamSubmitted) return;
+            isExamSubmitted = true;
+            clearInterval(timerInterval);
+
+            let totalScore = 0;
+            let correctMcq = 0;
+            let totalMcq = 0;
+
+            questionsData.forEach(q => {
+                if (q.type === 'mcq') {
+                    totalMcq++;
+                    if (userAnswers[q.id] === q.correct) {
+                        correctMcq++;
+                        totalScore += 0.4; // 18 mcq questions ~ 7.2 pts
+                    }
+                } else if (q.type === 'tf') {
+                    // True/False Scoring: count correct sub-items
+                    let correctItems = 0;
+                    if (userAnswers[q.id]) {
+                        q.items.forEach(item => {
+                            if (userAnswers[q.id][item.label] === item.correct) {
+                                correctItems++;
+                            }
+                        });
+                    }
+                    // Standard TF scoring scale (1 item: 0.1, 2 items: 0.25, 3 items: 0.5, 4 items: 1.0 approx)
+                    if (correctItems === 1) totalScore += 0.25;
+                    else if (correctItems === 2) totalScore += 0.5;
+                    else if (correctItems === 3) totalScore += 0.75;
+                    else if (correctItems === 4) totalScore += 1.0;
+                }
+            });
+
+            // Normalize score to 10 scale
+            const finalScoreVal = Math.min(10, Math.round(totalScore * 10) / 10).toFixed(1);
+
+            // Show Result Card
+            const resultCard = document.getElementById('result-card');
+            resultCard.classList.remove('hidden');
+            document.getElementById('final-score').innerText = `${finalScoreVal} / 10`;
+            document.getElementById('score-details').innerText = `Đúng ${correctMcq}/${totalMcq} câu Trắc nghiệm`;
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            renderQuestions();
+        }
+
+        // RESET QUIZ
+        function resetQuiz() {
+            userAnswers = {};
+            isExamSubmitted = false;
+            document.getElementById('result-card').classList.add('hidden');
+            if (currentQuizMode === 'exam') {
+                startTimer();
+            }
+            renderQuestions();
+        }
+    </script>
+</body>
+</html>
